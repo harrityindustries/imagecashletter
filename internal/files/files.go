@@ -135,14 +135,23 @@ func createFile(logger log.Logger, repo storage.ICLFileRepository) http.HandlerF
 				imagecashletter.ReadEbcdicEncodingOption(),
 				imagecashletter.BufferSizeOption(maxReaderBufferSize),
 			}
-			f, err := imagecashletter.NewReader(reader, opts...).Read()
-			if err != nil {
-				err = logger.LogErrorf("error reading image cache letter: %v", err).Err()
-				moovhttp.Problem(w, err)
-				return
-			} else {
-				req = &f
+			f, errs := imagecashletter.NewReader(reader, opts...).Read()
+			req = &f
+			if len(errs) > 0 {
+				// Log the errors and return a single error message
+				var errorMessages []string
+				for _, err := range errs {
+					logger.LogErrorf("error reading image cache letter: %v", err)
+					errorMessages = append(errorMessages, err.Error())
+				}
+				// combinedErrorMessage := strings.Join(errorMessages, "\n")
+				// err := fmt.Errorf("error reading image cache letter:\n%s", combinedErrorMessage)
+				// moovhttp.Problem(w, err)
+				// return
 			}
+			// 	else {
+			// 		req = &f
+			// 	}
 		}
 		if req.ID == "" {
 			req.ID = base.ID()

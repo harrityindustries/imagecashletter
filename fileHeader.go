@@ -254,7 +254,7 @@ func (fh *FileHeader) fieldInclusion() error {
 			Value: fh.ResendIndicator,
 			Msg:   msgFieldInclusion + ", did you use FileHeader()?"}
 	}
-	if fh.ImmediateDestination == "" {
+	if fh.ImmediateDestination == "" && !IsFRBCompatibilityModeEnabled() {
 		return &FieldError{FieldName: "ImmediateDestination",
 			Value: fh.ImmediateDestination,
 			Msg:   msgFieldInclusion + ", did you use FileHeader()?"}
